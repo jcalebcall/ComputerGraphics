@@ -1,0 +1,18 @@
+﻿Build started 10/7/2014 8:05:17 PM.
+     1>Project "C:\Users\Caleb\documents\visual studio 2012\Projects\ObjectViewTransforms\ObjectViewTransforms\ObjectViewTransforms.vcxproj" on node 2 (Build target(s)).
+     1>ClCompile:
+         C:\Program Files (x86)\Microsoft Visual Studio 11.0\VC\bin\CL.exe /c /I"C:\Users\Caleb\Documents\Visual Studio 2012\Projects\ObjectViewTransforms\ObjectViewTransforms\DevIL-SDK-x86-1.7.8\include" /I"C:\Program Files\boost\boost_1_56_0" /ZI /nologo /W3 /WX- /sdl /Od /Oy- /D _CRT_SECURE_NO_WARNINGS /D _MBCS /Gm /EHsc /RTC1 /MDd /GS /fp:precise /Zc:wchar_t /Zc:forScope /Fo"Debug\\" /Fd"Debug\vc110.pdb" /Gd /TP /analyze- /errorReport:prompt main.cpp
+         main.cpp
+     1>c:\users\caleb\documents\visual studio 2012\projects\objectviewtransforms\objectviewtransforms\main.cpp(42): warning C4018: '<' : signed/unsigned mismatch
+     1>c:\users\caleb\documents\visual studio 2012\projects\objectviewtransforms\objectviewtransforms\main.cpp(47): warning C4018: '<' : signed/unsigned mismatch
+     1>c:\users\caleb\documents\visual studio 2012\projects\objectviewtransforms\objectviewtransforms\main.cpp(451): warning C4018: '<' : signed/unsigned mismatch
+       Link:
+         C:\Program Files (x86)\Microsoft Visual Studio 11.0\VC\bin\link.exe /ERRORREPORT:PROMPT /OUT:"C:\Users\Caleb\documents\visual studio 2012\Projects\ObjectViewTransforms\Debug\ObjectViewTransforms.exe" /INCREMENTAL /NOLOGO opengl32.lib glu32.lib glut32.lib DevIL.lib ILU.lib ILUT.lib XInput9_1_0.lib kernel32.lib user32.lib gdi32.lib winspool.lib comdlg32.lib advapi32.lib shell32.lib ole32.lib oleaut32.lib uuid.lib odbc32.lib odbccp32.lib /MANIFEST /MANIFESTUAC:"level='asInvoker' uiAccess='false'" /manifest:embed /DEBUG /PDB:"C:\Users\Caleb\documents\visual studio 2012\Projects\ObjectViewTransforms\Debug\ObjectViewTransforms.pdb" /TLBID:1 /DYNAMICBASE /NXCOMPAT /IMPLIB:"C:\Users\Caleb\documents\visual studio 2012\Projects\ObjectViewTransforms\Debug\ObjectViewTransforms.lib" /MACHINE:X86 Debug\main.obj
+         Debug\wavefrontLoader.obj
+            Creating library C:\Users\Caleb\documents\visual studio 2012\Projects\ObjectViewTransforms\Debug\ObjectViewTransforms.lib and object C:\Users\Caleb\documents\visual studio 2012\Projects\ObjectViewTransforms\Debug\ObjectViewTransforms.exp
+         ObjectViewTransforms.vcxproj -> C:\Users\Caleb\documents\visual studio 2012\Projects\ObjectViewTransforms\Debug\ObjectViewTransforms.exe
+     1>Done Building Project "C:\Users\Caleb\documents\visual studio 2012\Projects\ObjectViewTransforms\ObjectViewTransforms\ObjectViewTransforms.vcxproj" (Build target(s)).
+
+Build succeeded.
+
+Time Elapsed 00:00:08.87
