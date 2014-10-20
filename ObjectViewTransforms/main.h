@@ -7,6 +7,7 @@
 #include <GL/glut.h>  // GLUT, include glu.h and gl.h
 #include <IL/il.h>
 #include <sys/stat.h>
+#include "2DVector.h"
 
 // Serialization
 #include <boost/archive/binary_oarchive.hpp>

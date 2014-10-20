@@ -1,4 +1,4 @@
-/*
+﻿/*
  * CS455 Objects and View Transforms
  * Project 3
  * Caleb Call
@@ -22,6 +22,38 @@ float camz = 0;
 float camry = 0;
 float camrx = 0;
 float tireR = 0;
+
+// CENTER OF TURNING
+float xCOT = 0;
+float yCOT = 0;
+float zCOT = 0;
+float carR = 0;
+
+// CENTER OF OBJECTS
+float xFL = -.4; 
+float zFL = -.54;
+float xBL = -.4;
+float zBL = .47;
+float xBR = .4;
+float zBR = .47;
+float xFR = .4;
+float zFR = -.54;
+float xCar = 0;
+float zCar = 0;
+
+void multiplyMatrices(float* matA, int rA, int cA, float* matB,
+					  int rB, int cB, float* matC, int rC, int cC) 
+{
+	for (int i = 0; i < rA; i++) {
+		for (int j = 0; j < cB; j++) {
+			float sum = 0.0;
+			for (int k = 0; k < rB; k++)
+				sum = sum + matA[i * cA + k] * matB[k * cB + j];
+			matC[i * cC + j] = sum;
+		}
+
+	}
+}
 
 /* Initialize OpenGL Graphics */
 void initGL() {
@@ -94,22 +126,54 @@ void cameraTransforms()
 	glMultMatrixf(translateToOrigin);
 }
 
+void drivingRotate(float& newX, float& newZ)
+{
+	float translate[] = { 1, 0, 0, 0, 
+					0, 1, 0, 0,
+					0, 0, 1, 0,  
+					-xCOT, -yCOT, -zCOT, 1  };
+
+	float a = carR; // angle
+	float rotate[] = { cos(a), 0, -sin(a), 0,  // rotation matrix about y-axis
+					     0,	   1,    0,    0,
+					   sin(a), 0, cos(a),  0,
+						 0,    0,    0,    1 };
+
+	float translateBack[] = { 1, 0, 0, 0, 
+					0, 1, 0, 0,
+					0, 0, 1, 0,  
+					xCOT, yCOT, zCOT, 1  };
+
+	glMultMatrixf(translateBack);
+	glMultMatrixf(rotate);
+	glMultMatrixf(translate);
+
+	// Calculate new positions
+	float temp [16];
+	float temp2 [16];
+	float temp3 [4];
+	float point[] = { newX, 0, newZ, 1 };
+	multiplyMatrices(translateBack, 4, 4, rotate, 4, 4, temp, 4, 4);
+	multiplyMatrices(temp, 4, 4, translate, 4, 4, temp2, 4, 4);
+	multiplyMatrices(temp2, 4, 4, point, 4, 1, temp3, 4, 1); 
+
+	newX = temp3[0];
+	newZ = temp3[2];
+}
+
 void renderCar()
 {
 	/* RENDER CAR *****************************
 	*******************************************/
 	glPushMatrix();
-	float a = M_PI / 3; // angle
-	float rotate[] = { cos(a), 0, -sin(a), 0,  // rotation matrix about y-axis
-					     0,	   1,    0,    0,
-					   sin(a), 0, cos(a),  0,
-						 0,    0,    0,    1 };
-	glMultMatrixf(rotate); // Multiply with ModelView matrix
 
+	drivingRotate(xCar, zCar);
+	
 	// choose texture and draw
 	glBindTexture(GL_TEXTURE_2D, texNames[0]); // Bind desired texture to GL_TEXTURE_2D
 	renderModel(car);
 	glPopMatrix();
+
 }
 
 void tireRotate()
@@ -128,12 +192,14 @@ void renderTireFL()
 	*******************************************/
 	glPushMatrix();
 	
+	drivingRotate(xFL, zFL);
+
 	float scaleFL[] = { .25,  0,  0, 0,    // Scale tire
 						 0, .25,  0, 0,
 						 0,  0, .25, 0,
 						 0,  0,  0, 1 };
 
-	float a = 4 * M_PI / 3;
+	float a = M_PI;
 	float rotateFL[] = { cos(a), 0, -sin(a), 0,  // Rotate tire about y-axis
 					       0,	 1,   0,     0,
 					     sin(a), 0, cos(a),  0,
@@ -142,12 +208,13 @@ void renderTireFL()
 	float translateFL[] = { 1, 0, 0, 0,    // Translate tire onto front left tire well
 						    0, 1, 0, 0,
 						    0, 0, 1, 0,  
-						    -.7, .15, .1, 1  };
+						    -.4, .15, -.54, 1  };
 
 	// Multiply the transforms in opposite order
 	glMultMatrixf(translateFL);
 	glMultMatrixf(scaleFL);
 	glMultMatrixf(rotateFL);
+
 	tireRotate();
 
 	// choose texture and draw
@@ -163,12 +230,14 @@ void renderTireBL()
 	*******************************************/
 	glPushMatrix();
 
+	drivingRotate(xBL, zBL);
+
 	float scaleBL[] = { .25,  0,  0, 0,    // Scale tire
 						 0, .25,  0, 0,
 						 0,  0, .25, 0,
 						 0,  0,  0, 1 };
 
-	float a = 4 * M_PI / 3;
+	float a = M_PI;
 	float rotateBL[] = { cos(a), 0, -sin(a), 0,  // Rotate tire about y-axis
 					       0,	 1,   0,     0,
 					     sin(a), 0, cos(a),  0,
@@ -177,7 +246,7 @@ void renderTireBL()
 	float translateBL[] = { 1, 0, 0, 0,    // Translate tire onto back left tire well
 						    0, 1, 0, 0,
 						    0, 0, 1, 0,  
-						    .175, .15, .65, 1  };
+						    -.4, .15, .47, 1  };
 
 	// Multiply the transforms in opposite order
 	glMultMatrixf(translateBL);
@@ -196,27 +265,22 @@ void renderTireBR()
 	/* RENDER BACK RIGHT TIRE *****************************
 	*******************************************/
 	glPushMatrix();
+
+	drivingRotate(xBR, zBR);
 	
 	float scaleBR[] = { .25,  0,  0, 0,    // Scale tire
 						 0, .25,  0, 0,
 						 0,  0, .25, 0,
 						 0,  0,  0, 1 };
 
-	float a = M_PI / 3;
-	float rotateBR[] = { cos(a), 0, -sin(a), 0,  // Rotate tire about y-axis
-					       0,	 1,   0,     0,
-					     sin(a), 0, cos(a),  0,
-						   0,    0,   0,     1 };
-
 	float translateBR[] = { 1, 0, 0, 0,    // Translate tire onto back right tire well
 						    0, 1, 0, 0,
 						    0, 0, 1, 0,  
-						    .65, .15, -.15, 1  };
+						    .4, .15, .47, 1  };
 
 	// Multiply the transforms in opposite order
 	glMultMatrixf(translateBR);
 	glMultMatrixf(scaleBR);
-	glMultMatrixf(rotateBR);
 
 	// choose texture and draw
 	glBindTexture(GL_TEXTURE_2D, texNames[1]); // Bind desired texture to GL_TEXTURE_2D
@@ -231,26 +295,21 @@ void renderTireFR()
 	*******************************************/
 	glPushMatrix();
 
+	drivingRotate(xFR, zFR);
+
 	float scaleFR[] = { .25,  0,  0, 0,    // Scale tire
 						 0, .25,  0, 0,
 						 0,  0, .25, 0,
 						 0,  0,  0, 1 };
 
-	float a = M_PI / 3;
-	float rotateFR[] = { cos(a), 0, -sin(a), 0,  // Rotate tire about y-axis
-					       0,	 1,   0,     0,
-					     sin(a), 0, cos(a),  0,
-						   0,    0,   0,     1 };
-
 	float translateFR[] = { 1, 0, 0, 0,    // Translate tire onto back left tire well
 						    0, 1, 0, 0,
 						    0, 0, 1, 0,  
-						    -.25, .16, -.65, 1  };
+						    .4, .15, -.54, 1  };
 
 	// Multiply the transforms in opposite order
 	glMultMatrixf(translateFR);
 	glMultMatrixf(scaleFR);
-	glMultMatrixf(rotateFR);
 	tireRotate();
 
 	// choose texture and draw
@@ -272,13 +331,20 @@ void renderParkingLot()
 					  0,  0, 1, 0,
 					  0,  0, 0, 1 };
 
+	float a = -M_PI / 3;
+	float rotate[] = { cos(a), 0, -sin(a), 0,  // Rotate
+					       0,	 1,   0,     0,
+					     sin(a), 0, cos(a),  0,
+						   0,    0,   0,     1 };
+
 	float translate[] = { 1, 0, 0, 0,    // Translate tire onto back left tire well
 						  0, 1, 0, 0,
 						  0, 0, 1, 0,  
-						  2.5, 0, 7.5, 1  };
+						  -5.2, 0, 5.7, 1  };
 
 	// Multiply the transforms in opposite order
 	glMultMatrixf(translate);
+	glMultMatrixf(rotate);
 	glMultMatrixf(scale);
 
 	// choose texture and draw
@@ -308,12 +374,12 @@ void renderGoku()
 	float translate[] = { 1, 0, 0, 0,    // Translate
 						  0, 1, 0, 0,
 						  0, 0, 1, 0,  
-						  .1, .75, 0, 1  };
+						  0, .75, 0, 1  };
 
 	// Multiply the transforms in opposite order
 	glMultMatrixf(translate);
 	glMultMatrixf(scale);
-	glMultMatrixf(rotate);
+	//glMultMatrixf(rotate);
 
 	glDisable (GL_TEXTURE_2D); // Disable texturing
 	glColor3f(1.0, 0.0, 0.0);
@@ -585,13 +651,13 @@ void joystick(unsigned int buttonMask, int x, int y, int z){
 		if (abs(gamepad.leftStickY) > 0.1)
 		{
 			camz += .3 * -gamepad.leftStickY; // z position
-			cout << "Leftstick Y : " << gamepad.leftStickY << endl;
+			//cout << "Leftstick Y : " << gamepad.leftStickY << endl;
 		}
 		
 		if (abs(gamepad.leftStickX) > 0.1)
 		{
 			camx += .3 * gamepad.leftStickX; // z position
-			cout << "Leftstick x: " << gamepad.leftStickX << endl;
+			//cout << "Leftstick x: " << gamepad.leftStickX << endl;
 		}
 
 		// Process translation using left thumbstick	 
@@ -604,6 +670,93 @@ void joystick(unsigned int buttonMask, int x, int y, int z){
 		if (abs(gamepad.rightStickX) > 0.1)
 		{
 			camry += .2 * -gamepad.rightStickX;
+		}
+
+		// Process driving car
+		if (gamepad.IsPressed(XINPUT_GAMEPAD_A))
+		{
+			if (tireR > 0)
+			{
+				// Take x-z coordinates, create new point with smaller z, rotate the point,
+				// add to original. Find left normal of this point
+				float nx = 0;
+				float ny = 0;
+				float nz = -.2;
+
+
+				float a = tireR;
+				
+				float dx = nx * cos(a) - nz * sin(a);
+				float dz = -(nx * sin(a) + nz * cos(a));
+
+				// Left, (-rz, rx)    right, (rz, -rx)
+				float normx = dz;
+				float normz = -dx;
+
+				float mag = sqrt(pow(normx, 2) + pow(normz, 2));
+				
+				float unormx = normx / mag;
+				float unormz = normz / mag;
+				
+				cout << "FL x: " << unormx << endl;
+				cout << "FL z: " << unormz << endl;
+
+				// Back Left tire norm 
+
+				float nblx = 0;
+				float nblz = -.2;
+
+				// Left, (-rz, rx)    right, (rz, -rx)
+				float normblx = nblz;
+				float normblz = -nblx;
+
+				float blmag = sqrt(pow(normblx, 2) + pow(normblz, 2));
+				
+				float blunormx = normblx / blmag;
+				float blunormz = normblz / blmag;				
+
+				cout << "BL x: " << blunormx << endl;
+				cout << "BL z: " << blunormz << endl;
+
+				// Calculate lengths
+				// t = (q − p) × s / (r × s)
+				// u = (q − p) × r / (r × s)
+				//cout << "xFL: " << to_string(xFL) << endl;
+				//cout << "zFL: " << to_string(zFL) << endl;
+				//cout << "xBR: " << to_string(xBR) << endl;
+				//cout << "zBR: " << to_string(zBR) << endl;
+				TwoDVector p = TwoDVector(xFL, zFL);
+				TwoDVector q = TwoDVector(xBL, zBL);
+				TwoDVector s = TwoDVector(blunormx, blunormz);
+				TwoDVector r = TwoDVector(unormx, unormz);
+
+				float t = (q.subtract(p).crossProduct(s)) / (r.crossProduct(s));
+				float u = (q.subtract(p).crossProduct(r)) / (r.crossProduct(s));
+
+				cout << "t: " << t << endl;
+				cout << "u: " << u << endl;
+
+				TwoDVector p1 = p.add(r.scale(t));
+				TwoDVector p2 = q.add(s.scale(u));
+
+				cout << "p + tr: " << p1.toString() << endl;
+				cout << "u + us: " << p2.toString() << endl;
+
+				// calculate the theta to rotate the car
+				cout << "length s: " + to_string(s.scale(u).mag()) << endl;
+				cout << "length r: " + to_string(r.scale(t).mag()) << endl;
+				float theta = acos(s.scale(u).mag() / r.scale(t).mag());
+
+				cout << "theta: " << to_string(theta) << endl;
+
+				xCOT = p1.x;
+				zCOT = p1.z;
+				carR = theta;
+			}
+			else if (tireR < 0)
+			{
+
+			}
 		}
 
 	}

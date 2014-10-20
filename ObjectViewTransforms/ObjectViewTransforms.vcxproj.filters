@@ -32,5 +32,8 @@
     <ClInclude Include="gamepad.h">
       <Filter>Header Files</Filter>
     </ClInclude>
+    <ClInclude Include="2DVector.h">
+      <Filter>Header Files</Filter>
+    </ClInclude>
   </ItemGroup>
 </Project>

@@ -181,3 +181,4 @@ void WFObject::modelRepresentation()
 		ModelFaces.push_back(mf);
 	}
 }
+
